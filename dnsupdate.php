@@ -1,6 +1,6 @@
 <?php
 
-$domain = "yourdomain.com"; // domain you want your ip to point to
+$domain = "yourdomain.com"; // domain
 $subdomain = "subdomain.yourdomain.com"; // subdomain you want your ip to point to
 $username = "user"; // rackspace username
 $apikey = "askglorh2oh14oh14ngo4i1o4n1o41o4"; // rackspace apikey
