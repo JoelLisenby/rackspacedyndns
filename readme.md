@@ -4,6 +4,7 @@ Setup:
 
 1. Log into mycloud.rackspace.com and add a sub-domain record to your chosen domain which points to your current IP (or any ip, it does not matter at this point)
 2. Modify dnsupdate.php with your chosen domain, subdomain and rackspace username, rackspace apikey
+3. chmod write permissions to lastip.txt and execute permission to dnsupdate.php
 3. To have the script run every 5 minutes just add the following to your crontab:
 
 */5 * * * * php /home/*user*/dyndns/dnsupdate.php
