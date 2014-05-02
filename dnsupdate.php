@@ -50,9 +50,9 @@ if($ipchanged) {
 
 	$domains = rackget($token_resp->access->token->id, $token_resp->access->serviceCatalog[13]->endpoints[0]->publicURL ."/domains");
 
-	foreach($domains->domains as $domain) {
-		if($domain->name == $domain) {
-			$domainid = $domain->id;
+	foreach($domains->domains as $rdomain) {
+		if($rdomain->name == $domain) {
+			$domainid = $rdomain->id;
 		}
 	}
 
