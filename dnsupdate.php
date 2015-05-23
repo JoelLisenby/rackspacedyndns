@@ -11,10 +11,9 @@ $ipchanged = false;
 
 if($ip !== $lastip) {
 	$ipchanged = true;
-	echo "ip changed. ". $lastip ." to ". $ip ."\n";
-	file_put_contents("lastip.txt", $ip);
+	echo 'IP changed'. (!empty($lastip) ? ' from '. $lastip : '') .' to '. $ip .".\n";
 } else {
-	echo "ip not changed. ". $ip ."\n";
+	echo 'IP not changed, still '. $ip .".\n";
 }
 
 if($ipchanged) {
@@ -44,11 +43,15 @@ if($ipchanged) {
 		)
 	));
 
-	$token_resp = json_decode(curl_exec($curl));
-
+	$token_resp = json_decode(curl_exec($curl), true);
 	curl_close($curl);
 
-	$domains = rackget($token_resp->access->token->id, $token_resp->access->serviceCatalog[13]->endpoints[0]->publicURL ."/domains");
+	$serviceCatalogIndex = getIndex('cloudDNS', $token_resp['access']['serviceCatalog']);
+
+	$token = $token_resp['access']['token']['id'];
+	$url_start = $token_resp['access']['serviceCatalog'][$serviceCatalogIndex]['endpoints'][0]['publicURL'];
+
+	$domains = rackget($token, $url_start ."/domains");
 
 	foreach($domains->domains as $rdomain) {
 		if($rdomain->name == $domain) {
@@ -56,7 +59,7 @@ if($ipchanged) {
 		}
 	}
 
-	$records = rackget($token_resp->access->token->id, $token_resp->access->serviceCatalog[13]->endpoints[0]->publicURL ."/domains/".$domainid);
+	$records = rackget($token, $url_start ."/domains/".$domainid);
 
 	foreach($records->recordsList->records as $record) {
 		if($record->name == $subdomain) {
@@ -71,7 +74,9 @@ if($ipchanged) {
 
 	$json_mod_data = json_encode($mod_data);
 
-	$mod = rackmod($token_resp->access->token->id, $token_resp->access->serviceCatalog[13]->endpoints[0]->publicURL ."/domains/".$domainid."/records/".$recordid, $json_mod_data);
+	$mod = rackmod($token, $url_start ."/domains/".$domainid."/records/".$recordid, $json_mod_data);
+
+	file_put_contents("lastip.txt", $ip);
 }
 
 function rackmod($token, $url, $data) {
@@ -107,4 +112,12 @@ function rackget($token, $url) {
 	$resp = curl_exec($curl);
 	$array = json_decode($resp);
 	return $array;
+}
+
+function getIndex($name, $array){
+    foreach($array as $key => $value){
+        if(is_array($value) && $value['name'] == $name)
+              return $key;
+    }
+    return null;
 }
